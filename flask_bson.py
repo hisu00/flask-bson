@@ -11,7 +11,7 @@ def accept_bson(require_bson = False, stream_over=1048576*5):
             if contype == 'application/bson':
                 import sys
                 try:
-                    if request.content_length > stream_at:
+                    if request.content_length > stream_over:
                         chunk_size = 4096
                         data = []
                         while True:
@@ -21,7 +21,7 @@ def accept_bson(require_bson = False, stream_over=1048576*5):
                         request.bson_data = bson.loads(''.join(data))
                     else:
                         request.bson_data = bson.loads(request.get_data())
-                except Exception, e:
+                except Exception as e:
                     return ('Error, request: ' + str(e), 400)
             elif require_bson and contype != 'application/bson':
                 return ("Error, request: must supply BSON content and set "
@@ -33,5 +33,5 @@ def accept_bson(require_bson = False, stream_over=1048576*5):
 def bsonify(obj):
     try:
         return Response(bson.dumps(obj), mimetype='application/bson')
-    except Exception, e:
+    except Exception as e:
         return ('Error, bsonify: ' + str(e), 400)
